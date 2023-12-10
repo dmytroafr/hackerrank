@@ -62,3 +62,30 @@ public class SL {
         System.out.println(root);
     }
 }
+
+//
+//        for (int i = 1; i <= edgesMap.size(); i++) {
+//            int first = listList.get(i-1).get(0);
+//            int second = listList.get(i-1).get(1);
+//
+//            if (map.containsKey(first)){
+//                map.put(first, map.get(first)+1);
+//            }else {
+//                map.put(first,1);
+//            }
+//            if (map.containsKey(second)){
+//                map.put(second, map.get(second)+1);
+//            }else {
+//                map.put(second,1);
+//            }
+//        }
+
+//
+// else if (!treeMap.containsKey(first) && !treeMap.containsKey(second)){
+//
+//         if (edgesMap.get(first).size()>1) {
+//         treeMap.put(first, new TreeNode(values[first - 1], color[first - 1] == 0 ? Color.RED : Color.GREEN, 1));
+//         } else {
+//         treeMap.put(first, new TreeLeaf(values[first - 1], color[first - 1] == 0 ? Color.RED : Color.GREEN, 1));
+//         }
+//         }

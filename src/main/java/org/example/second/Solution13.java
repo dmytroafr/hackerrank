@@ -1,12 +1,7 @@
 package org.example.second;
 
 import java.util.ArrayList;
-import java.io.*;
 import java.util.*;
-import java.text.*;
-import java.math.*;
-import java.util.regex.*;
-import java.util.stream.IntStream;
 
 enum Color {
     RED, GREEN
@@ -31,7 +26,6 @@ abstract class Tree {
         return depth;
     }
     public abstract void accept(TreeVis visitor);
-
 }
 
 class TreeNode extends Tree {
@@ -49,7 +43,6 @@ class TreeNode extends Tree {
     public void addChild(Tree child) {
         children.add(child);
     }
-
 }
 
 class TreeLeaf extends Tree {
@@ -85,29 +78,21 @@ class SumInLeavesVisitor extends TreeVis {
 }
 
 class ProductOfRedNodesVisitor extends TreeVis {
-    int result = 0;
+    long result = 1L;
     public int getResult() {
-        return result;
+        return (int) result;
     }
 
     public void visitNode(TreeNode node) {
 
         if (node.getColor().equals(Color.RED)){
-            if (result==0){
-                result= node.getValue();
-            } else {
-                result *= node.getValue();
-            }
+                result = result*node.getValue() % 1000000007;
         }
     }
 
     public void visitLeaf(TreeLeaf leaf) {
         if (leaf.getColor().equals(Color.RED)){
-            if (result==0){
-                result=leaf.getValue();
-            } else {
-                result *= leaf.getValue();
-            }
+            result = result*leaf.getValue() % 1000000007;
         }
     }
 }
@@ -138,60 +123,107 @@ class FancyVisitor extends TreeVis {
 
 public class Solution13 {
     public static Tree solve(){
-        TreeNode root;
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
         sc.nextLine();
-
         int[] values = Arrays.stream(sc.nextLine().split("\\s")).mapToInt(Integer::parseInt).toArray();
         int[] color = Arrays.stream(sc.nextLine().split("\\s")).mapToInt(Integer::parseInt).toArray();
 
-        List<Tree> treeList = new ArrayList<>();
+        Map<Integer,Tree> treeMap = new TreeMap<>();
         Map<Integer,Integer> map = new HashMap<>();
-        List<List<Integer>> listList = new ArrayList<>();
+        Map<Integer,List<Integer>> edgesMap = new HashMap<>();
+
         while (n-->1){
-            List<Integer> inter = new ArrayList<>();
-            inter.add(sc.nextInt());
-            inter.add(sc.nextInt());
-            listList.add(inter);
-        }
-        for (int i = 1; i <= listList.size(); i++) {
-            int first = listList.get(i-1).get(0);
-            int second = listList.get(i-1).get(1);
+            int a = sc.nextInt();
+            int b = sc.nextInt();
 
-            if (map.containsKey(first)){
-                map.put(first, map.get(first)+1);
-            }else {
-                map.put(first,1);
-            }
-            if (map.containsKey(second)){
-                map.put(second, map.get(second)+1);
-            }else {
-                map.put(second,1);
-            }
-        }
-        root = new TreeNode(values[0],color[0]==0?Color.RED:Color.GREEN,0 );
-        treeList.add(root);
-
-        for (List<Integer> integerList : listList) {
-
-            int first = Math.min(integerList.get(0), integerList.get(1));
-            int second = Math.max(integerList.get(0), integerList.get(1));
-
-            TreeNode treeNode = (TreeNode) treeList.get(first - 1);
-
-            Tree node;
-            if (map.get(second) > 1) {
-                node = new TreeNode(values[second - 1], color[second - 1] == 0 ? Color.RED : Color.GREEN, treeNode.getDepth() + 1);
+            if (edgesMap.containsKey(a)){
+                edgesMap.get(a).add(b);
+                edgesMap.get(a).sort(Integer::compareTo);
             } else {
-                node = new TreeLeaf(values[second - 1], color[second - 1] == 0 ? Color.RED : Color.GREEN, treeNode.getDepth() + 1);
+                List<Integer> list = new ArrayList<>();
+                list.add(b);
+                edgesMap.put(a,list);
             }
-            treeList.add(node);
-            treeNode.addChild(node);
 
+
+            if (map.containsKey(a)){
+                map.put(a, map.get(a)+1);
+            }else {
+                map.put(a,1);
+            }
+
+            if (map.containsKey(b)){
+                map.put(b, map.get(b)+1);
+            }else {
+                map.put(b,1);
+            }
         }
 
-        return root;
+        treeMap.put(1,new TreeNode(values[0],color[0] == 0 ? Color.RED : Color.GREEN,0 ));
+
+        boolean flag = true;
+        while (flag){
+
+            flag = false;
+            for (Map.Entry<Integer, List<Integer>> entry : edgesMap.entrySet()) {
+
+            int first = entry.getKey();
+
+            for (int i = 0; i < entry.getValue().size(); i++) {
+
+                int ft = first;
+                int second = entry.getValue().get(i);
+
+                if (treeMap.containsKey(ft) && treeMap.containsKey(second)) {
+                    continue;
+                } else if (!treeMap.containsKey(ft) && !treeMap.containsKey(second)) {
+
+//                    int found =0;
+//
+//                    for (Map.Entry<Integer, List<Integer>> entryI : edgesMap.entrySet()) {
+//
+//                            for (int j = 0; j < entryI.getValue().size() ; j++) {
+//
+//                                found = entryI.getValue().get(j);
+//                                if (treeMap.containsKey(found)) {
+//                                    second = ft;
+//                                    ft = found;
+//                                    i--;
+//                                    break;
+//                                }
+//                            }
+//
+//                    }
+                    continue;
+
+                }
+                flag=true;
+                if (!treeMap.containsKey(ft)) {
+                    int temp = ft;
+                    ft = second;
+                    second = temp;
+                }
+
+                Tree firstNode = treeMap.get(ft);
+
+
+                if (map.get(second) > 1) {
+                    treeMap.put(second, new TreeNode(values[second - 1], color[second - 1] == 0 ? Color.RED : Color.GREEN, firstNode.getDepth() + 1));
+                } else {
+                    treeMap.put(second, new TreeLeaf(values[second - 1], color[second - 1] == 0 ? Color.RED : Color.GREEN, firstNode.getDepth() + 1));
+                }
+
+                Tree secondNode = treeMap.get(second);
+                TreeNode node = (TreeNode) firstNode;
+                node.addChild(secondNode);
+
+
+                }
+            }
+        }
+
+        return treeMap.get(1);
     }
 
     public static void main(String[] args){
@@ -211,5 +243,9 @@ public class Solution13 {
         System.out.println(res1);
         System.out.println(res2);
         System.out.println(res3);
+
+        System.out.println(root);
+
+
     }
 }
