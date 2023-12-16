@@ -28,10 +28,23 @@ class Result13 {
 
     public static void countApplesAndOranges(int s, int t, int a, int b, List<Integer> apples, List<Integer> oranges) {
         // Write your code here
+        int app = (int) apples.stream().map(i->i+a).filter(i->i>=s&&i<=t).count();
+        int org = (int) oranges.stream().map(i->i+b).filter(i->i>=s&&i<=t).count();
 
+        System.out.println(app);
+        System.out.println(org);
     }
 
 }
+//7 11
+//        5 15
+//        3 2
+//        -2 2 1
+//        5 -6
+
+
+
+
 
 public class Solution13 {
     public static void main(String[] args) throws IOException {
